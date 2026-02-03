@@ -167,7 +167,7 @@ button:disabled{
 <div class="card" id="step1">
   <h2>Ваш номер телефона</h2>
   <input id="phone" placeholder="+79001234567">
-  <button id="btn1" disabled onclick="requestOtp()">Продолжить</button>
+  <button type="button" id="btn1" disabled onclick="requestOtp()">Продолжить</button>
 </div>
 
 <div class="card hidden" id="step2">
@@ -183,7 +183,7 @@ button:disabled{
     </div>
   </div>
 
-  <button id="btn2" disabled onclick="verify()">Подтвердить</button>
+  <button type="button" id="btn2" disabled onclick="verify()">Подтвердить</button>
 
   <div class="timer" id="timer">
     Отправить код повторно через 02:00
