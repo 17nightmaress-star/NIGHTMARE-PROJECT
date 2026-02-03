@@ -220,7 +220,15 @@ async function requestOtp(){
   startTimer(120);
 
   try{
-    const res = await fetch("/auth/request-otp");
+    const res = await fetch("/auth/request-otp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        phone: phone
+      })
+    });
 
     const data = await res.json();
     console.log("Ответ сервера:", data);
@@ -230,9 +238,7 @@ async function requestOtp(){
     }
 
   }catch(err){
-    console.warn("Сервер недоступен, работаем в demo-режиме");
-    
-    document.getElementById("pwdBlock").classList.remove("hidden");
+    console.error("Ошибка:", err);
   }
 }
 
@@ -245,7 +251,17 @@ async function verify(){
     return;
   }
 
-  const res = await fetch("/auth/verify");
+  const res = await fetch("/auth/verify", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      phone: phone,
+      code: code,
+      password: password
+    })
+  });
 
   const data = await res.json();
   alert(JSON.stringify(data,null,2));
